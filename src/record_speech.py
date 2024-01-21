@@ -1,12 +1,14 @@
 import pyaudio
 import wave
+import msvcrt
+import time
 
 chunk = 1024  # Record in chunks of 1024 samples
 sample_format = pyaudio.paInt16  # 16 bits per sample
 channels = 2
 fs = 44100  # Record at 44100 samples per second
 seconds = 3
-filename = "wav_files/male.wav"
+filename = "wav_files/output.wav"
 
 p = pyaudio.PyAudio()  # Create an interface to PortAudio
 
@@ -20,10 +22,27 @@ stream = p.open(format=sample_format,
 
 frames = []  # Initialize array to store frames
 
-# Store data in chunks for 3 seconds
+""" # Store data in chunks for 3 seconds
 for i in range(0, int(fs / chunk * seconds)):
     data = stream.read(chunk)
+    frames.append(data) """
+
+print("Press Enter to start recording. Press Enter again to stop...")
+
+# Wait for the first Enter key press to start recording
+while True:
+    if msvcrt.getch() == b'\r':
+        break
+
+print("Recording. Press Enter to stop...")
+
+# Record audio until Enter is pressed again
+start_time = time.time()
+while True:
+    data = stream.read(chunk)
     frames.append(data)
+    if msvcrt.kbhit() and msvcrt.getch() == b'\r':
+        break
 
 # Stop and close the stream 
 stream.stop_stream()
